@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>それって、だれのせい？ | 心のクセ・セルフチェック</title>
+    <!-- Tailwind CSS (CDN) - MIT License -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            bg: '#FDFBF7',
+                            card: '#FFFFFF',
+                            primary: '#FF8A8A',
+                            primaryHover: '#FF7070',
+                            accent: '#FFD966',
+                            mint: '#A8E6CF',
+                            blue: '#A8DADC',
+                            purple: '#D8B4F8',
+                            text: '#4A4A4A',
+                            subtext: '#7A7A7A'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #4A4A4A;
+            -webkit-tap-highlight-color: transparent;
+        }
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 2s infinite ease-in-out;
+        }
+        @keyframes pulse-light {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .animate-pulse-light {
+            animation: pulse-light 1.5s infinite ease-in-out;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans flex flex-col justify-between items-center p-4 sm:p-6 select-none">
+
+    <div class="w-full max-w-md mx-auto my-auto flex-1 flex flex-col justify-center">
+
+        <!-- ===== 1. スタート画面 ===== -->
+        <section id="screen-start" class="fade-in bg-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-amber-100/50 border border-amber-100 text-center flex flex-col justify-between min-h-[520px]">
+            <div>
+                <div class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-3">
+                    心理セルフチェック
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 leading-snug tracking-tight mb-2">
+                    それって、<br><span class="text-rose-500">だれのせい？</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-500 mb-6 leading-relaxed">
+                    つい自分や誰かを責めちゃってない？<br>
+                    今のあなたの「心のクセ」を楽しくのぞいてみよう！
+                </p>
+
+                <!-- メインビジュアル / キャラクター枠 -->
+                <div class="w-36 h-36 mx-auto mb-6 bg-amber-50 rounded-full flex items-center justify-center shadow-inner relative border-2 border-dashed border-amber-200 overflow-hidden p-2">
+                    <img src="image/top-face.png" 
+                         alt="イラスト" 
+                         class="w-full h-full object-contain animate-bounce-slow"
+                         onerror="this.onerror=null; this.src='top-face.png'; this.onerror=function(){ handleTopFaceError(this); };">
+                </div>
+            </div>
+
+            <div>
+                <button id="btn-start" onclick="startQuiz()" class="w-full py-4 px-6 bg-rose-500 hover:bg-rose-600 active:scale-95 transition-all text-white font-bold text-lg rounded-2xl shadow-lg shadow-rose-200 mb-4 cursor-pointer">
+                    診断をはじめる (全20問)
+                </button>
+                <button onclick="toggleModal(true)" class="text-xs text-gray-400 hover:text-gray-600 underline cursor-pointer p-2 mb-4 block mx-auto">
+                    このアプリについて
+                </button>
+                <div class="pt-2 border-t border-amber-100/60 mt-2">
+                    <a href="https://inoriyomi.my.canva.site/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] text-amber-800/70 hover:text-amber-900 underline cursor-pointer transition-colors p-1">
+                        <span>「祈詠みの世界へ」戻る</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 2. 質問画面 ===== -->
+        <section id="screen-quiz" class="hidden fade-in bg-white rounded-3xl p-6 shadow-xl shadow-amber-100/50 border border-amber-100 flex flex-col justify-between min-h-[540px]">
+            <div>
+                <!-- 画面タイトル表示を追加 -->
+                <div class="text-center pb-3 mb-2 border-b border-amber-100">
+                    <span class="text-xs font-bold text-gray-500 tracking-wider uppercase">セルフチェック回答中</span>
+                    <h2 class="text-base font-extrabold text-gray-800">それって、だれのせい？</h2>
+                </div>
+
+                <div class="flex justify-between items-center mb-2">
+                    <span id="quiz-progress-text" class="text-xs font-bold text-rose-500">Q. 1 / 20</span>
+                    <span class="text-xs text-gray-400">直感でお答えください</span>
+                </div>
+                <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden mb-6">
+                    <div id="quiz-progress-bar" class="bg-rose-400 h-full w-0 transition-all duration-300"></div>
+                </div>
+
+                <div class="min-h-[100px] flex items-center justify-center p-4 bg-amber-50/60 rounded-2xl border border-amber-100 mb-6">
+                    <p id="quiz-question" class="text-base sm:text-lg font-bold text-gray-800 text-center leading-relaxed">
+                        質問文がここに表示されます
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-2.5 mb-4">
+                <button onclick="selectAnswer(3)" class="w-full py-3.5 px-4 bg-rose-50 hover:bg-rose-100 border border-rose-200 active:scale-[0.98] transition-all rounded-xl text-rose-900 font-bold text-sm sm:text-base flex items-center justify-between text-left group">
+                    <span>とてもそう思う</span>
+                    <span class="text-xs bg-rose-200 group-hover:bg-rose-300 text-rose-800 px-2 py-1 rounded-md">3点</span>
+                </button>
+                <button onclick="selectAnswer(2)" class="w-full py-3.5 px-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 active:scale-[0.98] transition-all rounded-xl text-orange-900 font-bold text-sm sm:text-base flex items-center justify-between text-left group">
+                    <span>少しそう思う</span>
+                    <span class="text-xs bg-orange-200 group-hover:bg-orange-300 text-orange-800 px-2 py-1 rounded-md">2点</span>
+                </button>
+                <button onclick="selectAnswer(1)" class="w-full py-3.5 px-4 bg-teal-50 hover:bg-teal-100 border border-teal-200 active:scale-[0.98] transition-all rounded-xl text-teal-900 font-bold text-sm sm:text-base flex items-center justify-between text-left group">
+                    <span>あまりそう思わない</span>
+                    <span class="text-xs bg-teal-200 group-hover:bg-teal-300 text-teal-800 px-2 py-1 rounded-md">1点</span>
+                </button>
+                <button onclick="selectAnswer(0)" class="w-full py-3.5 px-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 active:scale-[0.98] transition-all rounded-xl text-gray-700 font-bold text-sm sm:text-base flex items-center justify-between text-left group">
+                    <span>ほとんどそう思わない</span>
+                    <span class="text-xs bg-gray-200 group-hover:bg-gray-300 text-gray-700 px-2 py-1 rounded-md">0点</span>
+                </button>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+                <button id="btn-prev" onclick="prevQuestion()" class="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 p-2">
+                    ← 前の質問
+                </button>
+                <span class="text-xs text-gray-400" id="quiz-status-sub">タップすると次へ進みます</span>
+            </div>
+        </section>
+
+        <!-- ===== 3. 診断中演出画面 ===== -->
+        <section id="screen-loading" class="hidden fade-in bg-white rounded-3xl p-8 shadow-xl text-center flex flex-col justify-center items-center min-h-[400px]">
+            <div class="relative w-24 h-24 mb-6">
+                <div class="absolute inset-0 rounded-full border-4 border-rose-100 animate-ping"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-t-rose-500 border-r-amber-400 border-b-teal-400 border-l-purple-400 animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-2xl">
+                    🧠
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2 animate-pulse-light">心のクセを分析中...</h2>
+            <p class="text-xs text-gray-500" id="loading-message">思考のパターンを集計しています</p>
+        </section>
+
+        <!-- ===== 4. 結果画面 ===== -->
+        <section id="screen-result" class="hidden fade-in space-y-6 pb-12">
+            <!-- タイトルカード -->
+            <div class="bg-white rounded-3xl p-6 shadow-xl border border-amber-100 text-center">
+                <div class="inline-block bg-rose-100 text-rose-700 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                    セルフチェック結果
+                </div>
+                <h2 class="text-2xl font-extrabold text-gray-800">
+                    あなたの「心のクセ」
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">※今のコンディションによる傾向です</p>
+            </div>
+
+            <!-- メインタイプ表示コンテナ (JSで動的生成) -->
+            <div id="result-types-container" class="space-y-6"></div>
+
+            <!-- type10: まあ、いろいろあるよね力 カード -->
+            <div id="result-type10-container" class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-6 shadow-xl border border-emerald-200 text-gray-800">
+                <!-- JSで動的生成 -->
+            </div>
+
+            <!-- アクションボタン -->
+            <div class="bg-white rounded-3xl p-6 shadow-xl border border-amber-100 text-center space-y-3">
+                <button onclick="shareResult()" class="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-500 active:scale-95 transition-all text-amber-950 font-bold rounded-2xl shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                    結果をコピーして共有する
+                </button>
+                <button onclick="goToTop()" class="w-full py-3.5 px-4 bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all text-gray-700 font-bold rounded-2xl cursor-pointer">
+                    TOP画面に戻る
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ===== 「このアプリについて」 モーダル ===== -->
+    <div id="modal-about" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2">このアプリについて</h3>
+            <div class="text-xs sm:text-sm text-gray-600 space-y-3 leading-relaxed">
+                <p class="font-bold text-rose-500">※ご使用前に必ずご確認ください</p>
+                <p>
+                    当アプリ「それって、だれのせい？」は、日常生活で生じやすい思考の傾き（心のクセ）をセルフチェックするためのエンターテインメント・気づき用ツールです。
+                </p>
+                <p>
+                    <strong>医学的・心理学的な正式診断ではありません。</strong>結果は個人の性格や価値観を断定するものではなく、その時々の状態や考え方の傾向を軽く振り返る目安としてお楽しみください。
+                </p>
+                <p class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-amber-900">
+                    💡 <strong>プライバシーの安心宣言</strong><br>
+                    ご回答データはすべてお使いの端末（ブラウザ内）でのみ処理され、外部のサーバーへ送信・保存されることは一切ありません。
+                </p>
+            </div>
+            <button onclick="toggleModal(false)" class="w-full py-3 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-700 cursor-pointer">
+                閉じる
+            </button>
+        </div>
+    </div>
+
+    <!-- トースト通知 -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs py-2.5 px-5 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50">
+        メッセージ
+    </div>
+
+    <script>
+        /* =========================================================
+           1. データ定義 (質問、タイプ、解説、アドバイス)
+           ========================================================= */
+
+        const QUESTIONS = [
+            "何か失敗すると、「私が悪かったのかな」と何度も考えてしまう。",
+            "相手が少し不機嫌そうだと、「私に原因があるのかも」と思いやすい。",
+            "新しいことを始める前に、「私には難しいかも」と感じやすい。",
+            "うまくできないことがあると、「やっぱり私はダメだ」と感じることがある。",
+            "困ったことが起きると、「誰のせいでこうなったの？」と考えることが多い。",
+            "トラブルがあると、自分にできることより先に相手の問題点が目につく。",
+            "自分と違う意見を聞くと、「それは違う」とすぐ感じることがある。",
+            "「私のやり方のほうが正しい」と思うことがある。",
+            "人からどう見られているかが気になって、行動を変えることがある。",
+            "周りの人と比べて、「自分だけできていないかも」と感じることがある。",
+            "失敗しないように、必要以上に確認や準備をしてしまうことがある。",
+            "疲れていても、「ちゃんとしなきゃ」と思って頑張りすぎてしまう。",
+            "誰かが困っていると、自分が何とかしなければと思う。",
+            "人に頼むより、自分でやった方が安心だと思うことが多い。",
+            "メッセージの返事が遅いと、「嫌われたのかな」と不安になることがある。",
+            "相手の表情や言い方の小さな変化に、「嫌われたかも」と敏感になりやすい。",
+            "一つ嫌なことがあると、「今日はもう全部ダメだ」と感じやすい。",
+            "うまくいかないとき、「相手や環境のせいかもしれない」と思うことがある。",
+            "問題が起きても、「自分にも相手にも、それぞれ事情がある」と考えられる。",
+            "失敗しても、「うまくいかなかったこと」と「自分の価値」は別だと思える。"
+        ];
+
+        // 各質問がどのタイプに関与しているかのマッピング (Q1~Q20)
+        const QUESTION_TYPE_MAP = [
+            ['01', '09'],       // Q1
+            ['01', '08'],       // Q2
+            ['02'],             // Q3
+            ['02', '09'],       // Q4
+            ['03'],             // Q5
+            ['03', '04'],       // Q6
+            ['04'],             // Q7 (type10: 3-pts)
+            ['04'],             // Q8
+            ['05'],             // Q9
+            ['02', '05'],       // Q10
+            ['06'],             // Q11
+            ['06', '07'],       // Q12
+            ['01', '07'],       // Q13
+            ['06', '07'],       // Q14
+            ['08'],             // Q15
+            ['05', '08'],       // Q16
+            ['09'],             // Q17 (type10: 3-pts)
+            ['03'],             // Q18
+            [],                 // Q19 (type10: pts)
+            []                  // Q20 (type10: pts)
+        ];
+
+        const TYPES = {
+            '01': {
+                id: '01',
+                name: 'なんでも私のせいさん',
+                subtitle: '責任感のかたまり！優しすぎる反省家',
+                color: 'rose',
+                beforeImg: 'image/type01-before.png',
+                afterImg: 'image/type01-after.png',
+                desc: '何かトラブルが起きると「私に落ち度があったかも…」と、真っ先に自分を振り返る心優しきタイプ。周りの平和を守るクッションになっていませんか？',
+                advice: '世の中の出来事の8割は、あなたとは関係ないお天気やタイミングのせいです！「ま、いっか！世界の風の向きが悪かったんだな」と肩の力を抜いてみましょう。'
+            },
+            '02': {
+                id: '02',
+                name: 'どうせ私なんてさん',
+                subtitle: '慎重で奥ゆかしい控えめヒーロー',
+                color: 'amber',
+                beforeImg: 'image/type02-before.png',
+                afterImg: 'image/type02-after.png',
+                desc: '「自分なんて…」と一歩引いてしまいがち。高すぎる理想を持っているからこそ、現実の自分にちょっぴり厳しくなってしまう繊細さを持っています。',
+                advice: 'できないことより「今日できた小さなこと（朝起きた、ご飯食べた）」を褒めてあげて！自分の一番の味方は、他ならぬあなた自身ですよ。'
+            },
+            '03': {
+                id: '03',
+                name: 'あの人のせいさん',
+                subtitle: '鋭い分析力のリアリスト',
+                color: 'orange',
+                beforeImg: 'image/type03-before.png',
+                afterImg: 'image/type03-after.png',
+                desc: '状況を客観的に観察し、不合理なことや他人のミスにすぐ気づけるタイプ。「なんであの人はこうしないの？」とイライラしちゃうことも。',
+                advice: '他人は「別の文化で育った宇宙人」だと思って観察してみると楽になります！他人は変えられないけれど、自分の反応や距離感は自由に選べますよ。'
+            },
+            '04': {
+                id: '04',
+                name: '正しいのは私さん',
+                subtitle: '軸がブレない筋の通ったリーダー',
+                color: 'purple',
+                beforeImg: 'image/type04-before.png',
+                afterImg: 'image/type04-after.png',
+                desc: '自分の信念やルールをしっかり持っている努力家。正しさへのこだわりが強いぶん、違う考え方に出会うと「それは違う！」と熱くなりがち。',
+                advice: '「正しさ」は人の数だけあります。「そういう世界線もあるのね～」と、珍しい珍獣を見るような面白がり方をしてみるのがおすすめです！'
+            },
+            '05': {
+                id: '05',
+                name: 'みんな私を見てるさん',
+                subtitle: '気配り上手な名女優',
+                color: 'pink',
+                beforeImg: 'image/type05-before.png',
+                afterImg: 'image/type05-after.png',
+                desc: '周囲の目線や空気を敏感に察知できるアンテナの持ち主。みんなの期待に応えようとして、少し疲れちゃうことがあります。',
+                advice: '実は周りの人も、自分のことで頭がいっぱいです（笑）。「誰も私を見てない、ラッキー！」と思って、好きな服を着て好きなように歩いてみましょう。'
+            },
+            '06': {
+                id: '06',
+                name: 'ちゃんとしなきゃさん',
+                subtitle: '信頼度100%の完璧パーソン',
+                color: 'indigo',
+                beforeImg: 'image/type06-before.png',
+                afterImg: 'image/type06-after.png',
+                desc: '「〜すべき」「完璧にやり遂げる」がモットーのしっかり者。手抜きが苦手で、限界まで頑張り続けてしまう危険性も。',
+                advice: '「70点＝超満点！」のルールを採用しましょう。たまには「だらける予定」をスケジュール帳に入れて、堂々とサボる練習をしてみてね。'
+            },
+            '07': {
+                id: '07',
+                name: '私がやらなきゃさん',
+                subtitle: '頼れる頼もしい救世主',
+                color: 'blue',
+                beforeImg: 'image/type07-before.png',
+                afterImg: 'image/type07-after.png',
+                desc: '困っている人を見過ごせない親分肌・姉御肌。「自分が引き受けなきゃ」と抱え込みすぎて、キャパオーバーになりがちです。',
+                advice: '「私に頼るチャンスを相手に譲ってあげる」と考えて、人にパスしてみましょう。あなたが休むと、周りの誰かが育つキッカケになります！'
+            },
+            '08': {
+                id: '08',
+                name: 'きっと嫌われたさん',
+                subtitle: '感受性豊かな愛されセンシティブ',
+                color: 'sky',
+                beforeImg: 'image/type08-before.png',
+                afterImg: 'image/type08-after.png',
+                desc: '相手のちょっとした表情や返信の間から「嫌われたかも…」と妄想ストーリーを広げてしまいがちな、思いやりのある繊細さん。',
+                advice: '返信が遅いのは、相手がただお腹を壊しているか、スマホを忘れただけです！勝手に悪いストーリーを作る前に、温かいお茶でも飲んで寝ちゃいましょう。'
+            },
+            '09': {
+                id: '09',
+                name: 'もう全部イヤさん',
+                subtitle: '感情豊かな素直なキャパオーバーさん',
+                color: 'red',
+                beforeImg: 'image/type09-before.png',
+                afterImg: 'image/type09-after.png',
+                desc: '1つのつまずきで「あーもう今日は全部ダメ！」と、世界が終わったような気分になりやすいドラマチックな情熱家。',
+                advice: '「今日は『全部イヤ日和』だな！」と割り切って、美味しいものを食べて布団に包まりましょう。一晩寝れば、世界はまた新しく始まります。'
+            },
+            '10': {
+                id: '10',
+                name: 'まあ、いろいろあるよねさん',
+                subtitle: '視野の広さ・しなやかさ',
+                color: 'emerald',
+                beforeImg: 'image/type10-before.png',
+                afterImg: 'image/type10-after.png',
+                desc: '物事を多角的に捉え、自分と他人の境界線をしっかり保ちながら「まあ、そんなこともあるさ」と受け流せるクッションのような力です。',
+                advice: ''
+            }
+        };
+
+        // 複数傾向時専用画像の定義
+        const MULTI_TYPE_IMAGES = {
+            beforeImg: 'image/multi-before.png',
+            afterImg: 'image/multi-after.png'
+        };
+
+        /* =========================================================
+           2. アプリケーション状態管理
+           ========================================================= */
+        let userAnswers = new Array(20).fill(null);
+        let currentQuestionIndex = 0;
+
+        /* =========================================================
+           3. 採点・スコア計算ロジック
+           ========================================================= */
+        function calculateScores() {
+            const scores = {
+                '01': 0, '02': 0, '03': 0, '04': 0, '05': 0,
+                '06': 0, '07': 0, '08': 0, '09': 0, '10': 0
+            };
+
+            const count3 = { '01':0,'02':0,'03':0,'04':0,'05':0,'06':0,'07':0,'08':0,'09':0 };
+            const count2 = { '01':0,'02':0,'03':0,'04':0,'05':0,'06':0,'07':0,'08':0,'09':0 };
+
+            userAnswers.forEach((ans, index) => {
+                if (ans === null) return;
+
+                // type01〜09 への加算
+                const relatedTypes = QUESTION_TYPE_MAP[index] || [];
+                relatedTypes.forEach(tId => {
+                    scores[tId] += ans;
+                    if (ans === 3) count3[tId] = (count3[tId] || 0) + 1;
+                    if (ans === 2) count2[tId] = (count2[tId] || 0) + 1;
+                });
+
+                // type10 (まあ、いろいろあるよね力) の計算ルール
+                if (index === 6) { // Q7: 3 - 回答点
+                    scores['10'] += (3 - ans);
+                } else if (index === 16) { // Q17: 3 - 回答点
+                    scores['10'] += (3 - ans);
+                } else if (index === 18) { // Q19: 回答点
+                    scores['10'] += ans;
+                } else if (index === 19) { // Q20: 回答点
+                    scores['10'] += ans;
+                }
+            });
+
+            return { scores, count3, count2 };
+        }
+
+        /* =========================================================
+           4. 画面遷移・クイズコントロール
+           ========================================================= */
+        function startQuiz() {
+            userAnswers = new Array(20).fill(null);
+            currentQuestionIndex = 0;
+            showScreen('screen-quiz');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qText = document.getElementById('quiz-question');
+            const progressText = document.getElementById('quiz-progress-text');
+            const progressBar = document.getElementById('quiz-progress-bar');
+            const btnPrev = document.getElementById('btn-prev');
+
+            qText.innerText = QUESTIONS[currentQuestionIndex];
+            progressText.innerText = `Q. ${currentQuestionIndex + 1} / 20`;
+            
+            const progressPercent = ((currentQuestionIndex + 1) / 20) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            btnPrev.disabled = (currentQuestionIndex === 0);
+        }
+
+        function selectAnswer(score) {
+            userAnswers[currentQuestionIndex] = score;
+
+            if (currentQuestionIndex < 19) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            showScreen('screen-loading');
+            
+            const loadingMsg = document.getElementById('loading-message');
+            const messages = [
+                "思考のパターンを集計中...",
+                "心のモヤモヤを分類中...",
+                "アドバイスを準備しています..."
+            ];
+            let msgIdx = 0;
+            const interval = setInterval(() => {
+                msgIdx = (msgIdx + 1) % messages.length;
+                if(loadingMsg) loadingMsg.innerText = messages[msgIdx];
+            }, 600);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                renderResults();
+                showScreen('screen-result');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 1800);
+        }
+
+        /* =========================================================
+           5. 診断結果表示ロジック（厳格な判定優先順位・表示ルール）
+           ========================================================= */
+        function renderResults() {
+            const { scores, count3, count2 } = calculateScores();
+            const mainTypeKeys = ['01', '02', '03', '04', '05', '06', '07', '08', '09'];
+            const container = document.getElementById('result-types-container');
+            container.innerHTML = '';
+
+            const score10 = scores['10'];
+
+            // 全問同一回答判定
+            const firstAns = userAnswers[0];
+            const isAllSame = userAnswers.every(ans => ans === firstAns);
+
+            // ---- 【優先順位 1】 全問0点の場合 ----
+            if (isAllSame && firstAns === 0) {
+                const noResultHtml = `
+                    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-amber-100 text-center space-y-3 fade-in">
+                        <div class="text-4xl mb-2">🌿</div>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800">
+                            現在は、特に強く出ている「心のクセ」はないみたい。
+                        </h3>
+                        <p class="text-xs sm:text-sm text-gray-600 leading-relaxed bg-amber-50/60 p-4 rounded-2xl border border-amber-100">
+                            今はどの傾向にも強く当てはまらない状態のようです。気持ちがとても穏やかで落ち着いているタイミングかもしれません。ゆったりとお過ごしくださいね。
+                        </p>
+                    </div>
+                `;
+                container.innerHTML = noResultHtml;
+                renderType10(score10, true);
+                return;
+            }
+
+            // ---- 【優先順位 2】 全問同一回答（全3点・全2点・全1点）の場合 ----
+            if (isAllSame) {
+                let sameMsgTitle = "";
+                let sameMsgDesc = "";
+
+                if (firstAns === 3) {
+                    sameMsgTitle = "すべての質問に強く「そう思う」と回答されています";
+                    sameMsgDesc = "今回はすべての質問に同じようにお答えいただいたため、タイプ間に差がつきませんでした。<br>今はいろいろな心のクセが同じくらい気になっているのかもしれません。無理にひとつへ決めず、「今の自分に特に近いのはどれかな？」という目線で眺めてみてください。";
+                } else if (firstAns === 2) {
+                    sameMsgTitle = "すべての質問に「少しそう思う」と回答されています";
+                    sameMsgDesc = "今回はすべての質問に同じくらい「少しそう思う」とお答えいただいたため、タイプ間に差がつきませんでした。<br>どれか一つが特に強いというより、いろいろな傾向が同じくらい顔を出している状態です。";
+                } else if (firstAns === 1) {
+                    sameMsgTitle = "すべての質問に「あまりそう思わない」と回答されています";
+                    sameMsgDesc = "強い傾向は目立っていませんが、質問構成上各タイプに均等な点数が入っています。気になるタイプがあれば軽く参考にしてみてください。";
+                }
+
+                let allSameHtml = `
+                    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-amber-100 text-center space-y-3 mb-6 fade-in">
+                        <div class="inline-block bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">
+                            回答パターンに関するお知らせ
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-extrabold text-gray-800 leading-snug">
+                            ${sameMsgTitle}
+                        </h3>
+                        <p class="text-xs sm:text-sm text-gray-600 leading-relaxed bg-amber-50/60 p-4 rounded-2xl border border-amber-100 text-left">
+                            ${sameMsgDesc}
+                        </p>
+
+                        <!-- 複数傾向専用画像 -->
+                        <div class="w-28 h-28 mx-auto my-4 relative flex items-center justify-center bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-inner">
+                            <img id="img-before-multi" 
+                                 src="${MULTI_TYPE_IMAGES.beforeImg}" 
+                                 alt="複数傾向 before" 
+                                 class="w-full h-full object-contain p-2"
+                                 onerror="handleMultiImageError(this, 'before')">
+                            <img id="img-after-multi" 
+                                 src="${MULTI_TYPE_IMAGES.afterImg}" 
+                                 alt="複数傾向 after" 
+                                 class="w-full h-full object-contain p-2 hidden"
+                                 onerror="handleMultiImageError(this, 'after')">
+                        </div>
+                    </div>
+                    <div class="space-y-3 fade-in">
+                `;
+
+                mainTypeKeys.forEach(tId => {
+                    const typeData = TYPES[tId];
+                    allSameHtml += `
+                        <div class="bg-white rounded-2xl p-4 shadow-md border border-amber-100 transition-all hover:border-amber-300">
+                            <div class="flex items-center justify-between gap-3">
+                                <div>
+                                    <h4 class="font-bold text-sm text-gray-800">${typeData.name}</h4>
+                                </div>
+                                <div class="text-right flex-shrink-0 flex items-center gap-2">
+                                    <span class="inline-block bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-full">
+                                        ${scores[tId]}点
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mt-2 pt-2 border-t border-gray-100">
+                                <button onclick="toggleMultiAdvice('${typeData.id}')" class="w-full text-left text-xs text-amber-900 font-bold flex items-center justify-between py-1 px-2 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors cursor-pointer">
+                                    <span>詳しく見る</span>
+                                    <span id="icon-adv-${typeData.id}">▼</span>
+                                </button>
+                                <div id="adv-box-${typeData.id}" class="hidden mt-2 p-3 bg-amber-50/60 rounded-xl text-xs text-gray-700 leading-relaxed space-y-2 border border-amber-100">
+                                    <p class="text-gray-600">${typeData.desc}</p>
+                                    <div class="p-2.5 bg-amber-100/70 rounded-lg text-amber-950">
+                                        <p class="font-bold text-[11px] text-amber-900 mb-0.5">【軽やか処方箋】</p>
+                                        <p class="text-xs">${typeData.advice}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                allSameHtml += `</div>`;
+                container.innerHTML = allSameHtml;
+                renderType10(score10, true);
+                return;
+            }
+
+            // ---- 通常の回答データ処理 ----
+            // 3点未満のタイプは原則として結果表示しない
+            let candidates = mainTypeKeys
+                .map(key => ({
+                    id: key,
+                    score: scores[key],
+                    c3: count3[key] || 0,
+                    c2: count2[key] || 0
+                }))
+                .filter(item => item.score >= 3);
+
+            // 候補が0件の場合（最高点でも0〜2点）
+            if (candidates.length === 0) {
+                const noResultHtml = `
+                    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-amber-100 text-center space-y-3 fade-in">
+                        <div class="text-4xl mb-2">🌿</div>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800">
+                            現在は、特に強く出ている「心のクセ」はないみたい。
+                        </h3>
+                        <p class="text-xs sm:text-sm text-gray-600 leading-relaxed bg-amber-50/60 p-4 rounded-2xl border border-amber-100">
+                            気持ちが比較的穏やかで落ち着いている状態か、全体のバランスがとても良く取れているタイミングかもしれません。ゆったりとお過ごしくださいね。
+                        </p>
+                    </div>
+                `;
+                container.innerHTML = noResultHtml;
+                renderType10(score10, false);
+                return;
+            }
+
+            // ソート（第1: 得点, 第2: 3点数, 第3: 2点数）
+            candidates.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                if (b.c3 !== a.c3) return b.c3 - a.c3;
+                return b.c2 - a.c2;
+            });
+
+            const maxScore = candidates[0].score;
+
+            // ---- type10 × 最高点の組み合わせサマリーメッセージ生成 ----
+            let comboSummaryHtml = '';
+            
+            if (maxScore <= 4 && score10 >= 9) {
+                // 仕様3: 心のクセが弱く(3-4点)、type10が高い(9-12点)
+                comboSummaryHtml = `
+                    <div class="bg-emerald-50/80 rounded-3xl p-5 border border-emerald-200 text-center mb-5 fade-in">
+                        <div class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                            全体の状態
+                        </div>
+                        <h3 class="text-base sm:text-lg font-bold text-emerald-950 mb-1 leading-snug">
+                            少しクセはあるけれど、今はかなり落ち着いて見られているみたい。
+                        </h3>
+                        <p class="text-xs text-emerald-800 leading-relaxed">
+                            気になるところだけ、軽く振り返るくらいでよさそうです。
+                        </p>
+                    </div>
+                `;
+            } else if (maxScore >= 5 && maxScore <= 6 && score10 >= 9) {
+                // 仕様4: 心のクセが中程度(5-6点)、type10が高い(9-12点)
+                comboSummaryHtml = `
+                    <div class="bg-teal-50/80 rounded-3xl p-5 border border-teal-200 text-center mb-5 fade-in">
+                        <div class="inline-block bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                            全体の状態
+                        </div>
+                        <h3 class="text-base sm:text-lg font-bold text-teal-950 mb-1 leading-snug">
+                            少し気になりやすいクセはあるけれど、ちゃんと見直せる力もあります。
+                        </h3>
+                        <p class="text-xs text-teal-800 leading-relaxed">
+                            気持ちが揺れても、そのまま飲み込まれずに戻ってこられそうです。
+                        </p>
+                    </div>
+                `;
+            } else if (maxScore >= 7 && score10 >= 9) {
+                // 仕様5: 心のクセが強く(7-9点)、type10も高い(9-12点)
+                comboSummaryHtml = `
+                    <div class="bg-amber-50/80 rounded-3xl p-5 border border-amber-200 text-center mb-5 fade-in">
+                        <div class="inline-block bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                            全体の状態
+                        </div>
+                        <h3 class="text-base sm:text-lg font-bold text-amber-950 mb-1 leading-snug">
+                            今はこのクセが強めに出ているけれど、同時に見直す力もしっかりあります。
+                        </h3>
+                        <p class="text-xs text-amber-900 leading-relaxed">
+                            気持ちが揺れても、少しずつ自分らしく戻れる力を持っています。
+                        </p>
+                    </div>
+                `;
+            } else if (maxScore >= 7 && score10 <= 4) {
+                // 仕様6: 心のクセが強く(7-9点)、type10が低い(0-4点)
+                comboSummaryHtml = `
+                    <div class="bg-rose-50/80 rounded-3xl p-5 border border-rose-200 text-center mb-5 fade-in">
+                        <div class="inline-block bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                            全体の状態
+                        </div>
+                        <h3 class="text-base sm:text-lg font-bold text-rose-950 mb-1 leading-snug">
+                            今は、この心のクセに少し引っぱられやすい時かもしれません。
+                        </h3>
+                        <p class="text-xs text-rose-900 leading-relaxed">
+                            無理に変えようとせず、まずは「こう感じているんだな」と気づくだけでも十分です。
+                        </p>
+                    </div>
+                `;
+            }
+
+            if (comboSummaryHtml) {
+                container.insertAdjacentHTML('beforeend', comboSummaryHtml);
+            }
+
+            // 表示対象タイプ（上位3つまで）
+            const displayCandidates = candidates.slice(0, 3);
+
+            displayCandidates.forEach((item, index) => {
+                const typeData = TYPES[item.id];
+                const score = item.score;
+
+                // 仕様1: 点数帯に応じた表現・トーン
+                let scoreTierLabel = '';
+                let tierDesc = '';
+                let tierSubAdvice = '';
+
+                if (score >= 7) {
+                    scoreTierLabel = '今は強めに出ているみたい';
+                    tierDesc = `「${typeData.name}」が、今はかなり強めに出ているみたい。<br>この考え方が、今の気持ちや行動に影響している可能性があります。`;
+                    tierSubAdvice = '責める必要はありません。まずは「今こうなっているんだな」と気づくだけでも十分です。';
+                } else if (score >= 5) {
+                    scoreTierLabel = 'やや出やすくなっているみたい';
+                    tierDesc = `「${typeData.name}」が、やや出やすくなっているみたい。<br>気づかないうちに、この考え方に寄りやすい時があるかもしれません。`;
+                    tierSubAdvice = '少しだけ意識しておくと、楽になる場面がありそうです。';
+                } else { // 3〜4点
+                    scoreTierLabel = '少し顔を出しているみたい';
+                    tierDesc = `「${typeData.name}」が少し顔を出しているみたい。<br>今はこの考え方が少し気になることはあっても、強く引っぱられている感じではなさそうです。`;
+                    tierSubAdvice = '「あ、ちょっとあるかも」くらいで、軽く眺めてみてください。';
+                }
+
+                // 仕様7: 表示上の強弱コントロール
+                let cardStyle = '';
+                let titleSize = '';
+                let imgSizeClass = '';
+                let isMainCard = false;
+
+                // 特例: クセが弱く(3-4点) & type10が高い(9-12点)場合は全体的に控えめ表示
+                const isMildMode = (maxScore <= 4 && score10 >= 9);
+
+                if (score >= 7 && !isMildMode) {
+                    // 7〜9点：メインカードとして強調
+                    cardStyle = 'border-2 border-rose-300 bg-gradient-to-b from-rose-50/40 to-white shadow-xl p-6 sm:p-7';
+                    titleSize = 'text-xl sm:text-2xl font-black';
+                    imgSizeClass = 'w-32 h-32 my-3';
+                    isMainCard = true;
+                } else if (score >= 5 && !isMildMode) {
+                    // 5〜6点：中程度
+                    cardStyle = 'border border-amber-200 bg-white shadow-lg p-5 sm:p-6';
+                    titleSize = 'text-lg font-bold';
+                    imgSizeClass = 'w-24 h-24 my-2';
+                } else {
+                    // 3〜4点（または mildMode）：小さめ・軽い表示
+                    cardStyle = 'border border-gray-200 bg-gray-50/60 shadow-sm p-4 sm:p-5';
+                    titleSize = 'text-base font-bold';
+                    imgSizeClass = 'w-20 h-20 my-2'; // 画像も大きく主役にしすぎない
+                }
+
+                // 画像表示 (3-4点の場合やmildModeの時は控えめサイズで表示)
+                const imageMarkup = `
+                    <div class="${imgSizeClass} relative flex items-center justify-center bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-inner mx-auto">
+                        <img id="img-before-${typeData.id}" 
+                             src="${typeData.beforeImg}" 
+                             alt="${typeData.name} before" 
+                             class="w-full h-full object-contain p-2"
+                             onerror="handleImageError(this, '${typeData.id}', 'before')">
+                        <img id="img-after-${typeData.id}" 
+                             src="${typeData.afterImg}" 
+                             alt="${typeData.name} after" 
+                             class="w-full h-full object-contain p-2 hidden"
+                             onerror="handleImageError(this, '${typeData.id}', 'after')">
+                    </div>
+                `;
+
+                const cardHtml = `
+                    <div class="rounded-3xl ${cardStyle} flex flex-col items-center text-center relative overflow-hidden transition-all fade-in mb-4">
+                        <div class="w-full text-left mb-2 flex justify-between items-center">
+                            <span class="inline-block px-3 py-1 bg-amber-100/90 text-amber-900 text-xs font-bold rounded-full">
+                                ${scoreTierLabel}
+                            </span>
+                            <span class="text-xs font-extrabold text-rose-500 bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-100">
+                                ${score}点
+                            </span>
+                        </div>
+
+                        ${imageMarkup}
+
+                        <h3 class="${titleSize} text-gray-800 mt-1 mb-0.5">
+                            ${typeData.name}
+                        </h3>
+                        <p class="text-xs text-rose-500 font-bold mb-3">
+                            ${typeData.subtitle}
+                        </p>
+
+                        <!-- 点数帯別説明文 -->
+                        <div class="text-xs sm:text-sm text-gray-700 leading-relaxed mb-3 bg-white/90 p-3.5 rounded-xl w-full text-left border border-amber-100/60">
+                            <p class="mb-2 font-medium">${tierDesc}</p>
+                            <p class="text-xs text-amber-900 bg-amber-50 p-2 rounded-lg border border-amber-100/80">💡 ${tierSubAdvice}</p>
+                        </div>
+
+                        <!-- 詳しく見る（本来の解説＆処方箋） -->
+                        <div class="w-full">
+                            <button id="btn-adv-${typeData.id}" onclick="toggleAdvice('${typeData.id}')" class="w-full py-2.5 px-3 bg-amber-100/80 hover:bg-amber-200 text-amber-950 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer">
+                                <span>💡 元々の傾向とアドバイスをひらく</span>
+                                <span id="icon-adv-${typeData.id}">▼</span>
+                            </button>
+
+                            <div id="adv-box-${typeData.id}" class="hidden mt-3 p-3.5 bg-amber-50 rounded-xl border border-amber-200/80 text-left text-xs text-amber-950 leading-relaxed fade-in space-y-2">
+                                <p class="text-gray-600">${typeData.desc}</p>
+                                <div class="p-2.5 bg-amber-100/70 rounded-lg">
+                                    <p class="font-bold text-[11px] text-amber-900 mb-0.5">【軽やか処方箋】</p>
+                                    <p>${typeData.advice}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            renderType10(score10, false);
+        }
+
+        /* =========================================================
+           6. type10 (視野の広さ・しなやかさ) レンダリング
+           ========================================================= */
+        function renderType10(score10, isAllSameMode) {
+            const container10 = document.getElementById('result-type10-container');
+            
+            // 仕様2: type10 単体の点数帯メッセージ
+            let levelMessage = '';
+            if (score10 >= 9) {
+                // 9〜12点: しなやかさが高い
+                levelMessage = 'いろいろな見方を持てる、しなやかさがあります。自分も相手も責めすぎずに考え直せる力が、しっかり育っています。';
+            } else if (score10 >= 5) {
+                // 5〜8点: 見直す力がある
+                levelMessage = '気持ちが揺れても、少しずつ距離を取って見直せる力があります。';
+            } else {
+                // 0〜4点: 今は視野が狭くなりやすい時期
+                levelMessage = '今は少し、気持ちが一方向に寄りやすい時かもしれません。すぐに答えを出さず、少し時間を置いてみてもよさそうです。';
+            }
+
+            const isAllSameNotice = isAllSameMode 
+                ? `<p class="text-[11px] text-emerald-800 bg-emerald-100/70 p-2 rounded-lg mb-3">※全問均一な回答だったため、このスコアも回答パターンの影響を受けています。</p>` 
+                : '';
+
+            container10.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-extrabold bg-emerald-200 text-emerald-950 px-3 py-1 rounded-full">
+                        順位とは別の「特別スコア」
+                    </span>
+                    <span class="text-xs font-bold text-emerald-700">Type 10</span>
+                </div>
+                <h3 class="text-xl font-black text-emerald-950 mb-1">
+                    まあ、いろいろあるよね力
+                </h3>
+                <p class="text-xs text-emerald-700 font-bold mb-3">（視野の広さ・しなやかさ：0〜12点）</p>
+
+                ${isAllSameNotice}
+
+                <div class="bg-white/80 rounded-2xl p-4 mb-4 border border-emerald-100 text-center">
+                    <div class="text-3xl font-black text-emerald-600 mb-2">
+                        ${score10} <span class="text-sm font-normal text-gray-500">/ 12 点</span>
+                    </div>
+                    <div class="w-full bg-emerald-100 h-3 rounded-full overflow-hidden">
+                        <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: ${(score10 / 12) * 100}%"></div>
+                    </div>
+                </div>
+
+                <p class="text-xs sm:text-sm text-emerald-950 leading-relaxed bg-white/70 p-3.5 rounded-xl border border-emerald-100">
+                    ${levelMessage}
+                </p>
+            `;
+        }
+
+        /* =========================================================
+           7. 共通ヘルパー・画像エラーフォールバック処理
+           ========================================================= */
+        function handleTopFaceError(imgElem) {
+            const svgData = `
+                <svg class="w-24 h-24 animate-bounce-slow text-rose-400" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="40" fill="#FFD966" opacity="0.4"/>
+                    <circle cx="50" cy="50" r="32" fill="#FFF"/>
+                    <circle cx="38" cy="45" r="4" fill="#4A4A4A"/>
+                    <circle cx="62" cy="45" r="4" fill="#4A4A4A"/>
+                    <path d="M 40 62 Q 50 70 60 62" stroke="#4A4A4A" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <path d="M 25 35 Q 35 30 40 36" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <path d="M 75 35 Q 65 30 60 36" stroke="#4A4A4A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                </svg>
+            `;
+            const parent = imgElem.parentElement;
+            if (parent) {
+                parent.innerHTML = svgData;
+            }
+        }
+
+        function toggleAdvice(typeId) {
+            const advBox = document.getElementById(`adv-box-${typeId}`);
+            const btnIcon = document.getElementById(`icon-adv-${typeId}`);
+            const imgBefore = document.getElementById(`img-before-${typeId}`);
+            const imgAfter = document.getElementById(`img-after-${typeId}`);
+
+            if (advBox.classList.contains('hidden')) {
+                advBox.classList.remove('hidden');
+                if (btnIcon) btnIcon.innerText = '▲';
+                if (imgBefore) imgBefore.classList.add('hidden');
+                if (imgAfter) imgAfter.classList.remove('hidden');
+            } else {
+                advBox.classList.add('hidden');
+                if (btnIcon) btnIcon.innerText = '▼';
+                if (imgBefore) imgBefore.classList.remove('hidden');
+                if (imgAfter) imgAfter.classList.add('hidden');
+            }
+        }
+
+        // 大量同点・全問同一回答モード用のアドバイス切替 ＆ 共通複数画像（multi-before/after）切り替え
+        function toggleMultiAdvice(typeId) {
+            const advBox = document.getElementById(`adv-box-${typeId}`);
+            const btnIcon = document.getElementById(`icon-adv-${typeId}`);
+            const imgBefore = document.getElementById('img-before-multi');
+            const imgAfter = document.getElementById('img-after-multi');
+
+            if (advBox.classList.contains('hidden')) {
+                advBox.classList.remove('hidden');
+                if (btnIcon) btnIcon.innerText = '▲';
+                // 複数画像切り替え（Before -> After）
+                if (imgBefore && imgAfter) {
+                    imgBefore.classList.add('hidden');
+                    imgAfter.classList.remove('hidden');
+                }
+            } else {
+                advBox.classList.add('hidden');
+                if (btnIcon) btnIcon.innerText = '▼';
+                if (imgBefore && imgAfter) {
+                    imgBefore.classList.remove('hidden');
+                    imgAfter.classList.add('hidden');
+                }
+            }
+        }
+
+        function handleImageError(imgElem, typeId, state) {
+            const isAfter = (state === 'after');
+            const faceEmoji = isAfter ? '✨😊✨' : '🥺💦';
+            const bgColor = isAfter ? '#E6FFFA' : '#FFF5F5';
+            const strokeColor = isAfter ? '#319795' : '#E53E3E';
+
+            const svgData = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full">
+                    <rect width="120" height="120" rx="20" fill="${bgColor}" />
+                    <circle cx="60" cy="55" r="35" fill="#FFF" stroke="${strokeColor}" stroke-width="3" stroke-dasharray="${isAfter ? 'none' : '4,2'}"/>
+                    <text x="60" y="62" font-size="22" text-anchor="middle">${faceEmoji}</text>
+                    <text x="60" y="102" font-size="10" font-weight="bold" fill="#718096" text-anchor="middle">Type ${typeId} (${state})</text>
+                </svg>
+            `;
+            const parent = imgElem.parentElement;
+            if (parent) {
+                const placeholderDiv = document.createElement('div');
+                placeholderDiv.className = 'w-full h-full flex items-center justify-center';
+                placeholderDiv.innerHTML = svgData;
+                imgElem.replaceWith(placeholderDiv);
+            }
+        }
+
+        function handleMultiImageError(imgElem, state) {
+            const isAfter = (state === 'after');
+            const faceEmoji = isAfter ? '🌈✨😊' : '☁️🤔💭';
+            const bgColor = isAfter ? '#E6FFFA' : '#FFFBEB';
+            const strokeColor = isAfter ? '#319795' : '#D97706';
+
+            const svgData = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="w-full h-full">
+                    <rect width="120" height="120" rx="20" fill="${bgColor}" />
+                    <circle cx="60" cy="55" r="35" fill="#FFF" stroke="${strokeColor}" stroke-width="3" stroke-dasharray="${isAfter ? 'none' : '4,2'}"/>
+                    <text x="60" y="62" font-size="20" text-anchor="middle">${faceEmoji}</text>
+                    <text x="60" y="102" font-size="9" font-weight="bold" fill="#718096" text-anchor="middle">Multi-Type (${state})</text>
+                </svg>
+            `;
+            const parent = imgElem.parentElement;
+            if (parent) {
+                const placeholderDiv = document.createElement('div');
+                placeholderDiv.className = 'w-full h-full flex items-center justify-center';
+                placeholderDiv.innerHTML = svgData;
+                imgElem.replaceWith(placeholderDiv);
+            }
+        }
+
+        function showScreen(screenId) {
+            const screens = ['screen-start', 'screen-quiz', 'screen-loading', 'screen-result'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (id === screenId) {
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('modal-about');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function goToTop() {
+            userAnswers = new Array(20).fill(null);
+            currentQuestionIndex = 0;
+            showScreen('screen-start');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function shareResult() {
+            const { scores, count3, count2 } = calculateScores();
+            const mainTypeKeys = ['01', '02', '03', '04', '05', '06', '07', '08', '09'];
+            
+            let candidates = mainTypeKeys
+                .map(key => ({ id: key, score: scores[key], c3: count3[key]||0, c2: count2[key]||0 }))
+                .filter(item => item.score >= 3)
+                .sort((a,b) => (b.score !== a.score ? b.score - a.score : (b.c3 !== a.c3 ? b.c3 - a.c3 : b.c2 - a.c2)));
+
+            let mainText = '';
+            if (candidates.length > 0) {
+                mainText = `私の今の心のクセは…『${TYPES[candidates[0].id].name}』(${candidates[0].score}点)でした！`;
+            } else {
+                mainText = `私の今の心のクセは…特に強く出ているものはありませんでした！`;
+            }
+
+            const text = `【それって、だれのせい？】\n${mainText}\n「まあ、いろいろあるよね力」：${scores['10']}/12点\n#心のクセ診断 #セルフチェック`;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('結果をクリップボードにコピーしました！');
+                }).catch(() => {
+                    fallbackCopyText(text);
+                });
+            } else {
+                fallbackCopyText(text);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('結果をクリップボードにコピーしました！');
+            } catch (err) {
+                showToast('コピーに失敗しました');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
